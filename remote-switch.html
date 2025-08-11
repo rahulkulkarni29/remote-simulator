@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SwitchPilot - Remote Control System</title>
+  <style>
+    :root {
+      --primary: rgb(222, 242, 238);
+      --success: #00c853;
+      --danger: #f44336;
+      --gray: #757575;
+      --light-gray: #ffffff;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f0f0;
+      padding: 20px;
+      color: #333;
+    }
+    
+    header {
+      background-color: var(--primary);
+      color: rgb(0, 0, 0);
+      padding: 20px;
+      border-radius: 10px 10px 0 0;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .logo {
+      font-size: 28px;
+      margin-right: 10px;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgb(222, 242, 238);
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .switches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    
+    .switch-card {
+      background-color: var(--light-gray);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .switch-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .switch-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .switch-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    
+    .toggle-container {
+      display: inline-block;
+      position: relative;
+    }
+    
+    .toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 60px;
+      height: 30px;
+      border-radius: 15px;
+      background-color: var(--gray);
+      position: relative;
+      outline: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .toggle::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: transform 0.3s;
+    }
+    
+    .toggle:checked {
+      background-color: var(--success);
+    }
+    
+    .toggle:checked::after {
+      transform: translateX(30px);
+    }
+    
+    .switch-status {
+      margin-top: 15px;
+      font-weight: 500;
+    }
+    
+    .status-on {
+      color: var(--success);
+    }
+    
+    .status-off {
+      color: var(--danger);
+    }
+    
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--gray);
+      border-top: 1px solid #eee;
+    }
+    
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--primary);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 5px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    @media (max-width: 768px) {
+      .switches-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .switches-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">🎛️</div>
+      <h1>SwitchPilot</h1>
+    </header>
+    
+    <div class="switches-grid">
+      <div class="switch-card" id="fan-card">
+        <div class="switch-icon">🌀</div>
+        <div class="switch-name">Fan</div>
+        <div class="toggle-container">
+          <input type="checkbox" class="toggle" id="fan-toggle">
+        </div>
+        <div class="switch-status" id="fan-status">Connecting...</div>
+      </div>
+      
+      <div class="switch-card" id="light-card">
+        <div class="switch-icon">💡</div>
+        <div class="switch-name">Light</div>
+        <div class="toggle-container">
+          <input type="checkbox" class="toggle" id="light-toggle">
+        </div>
+        <div class="switch-status" id="light-status">Connecting...</div>
+      </div>
+      
+      <div class="switch-card" id="geyser-card">
+        <div class="switch-icon">🚿</div>
+        <div class="switch-name">Geyser</div>
+        <div class="toggle-container">
+          <input type="checkbox" class="toggle" id="geyser-toggle">
+        </div>
+        <div class="switch-status" id="geyser-status">Connecting...</div>
+      </div>
+      
+      <div class="switch-card" id="ac-card">
+        <div class="switch-icon">❄️</div>
+        <div class="switch-name">AC</div>
+        <div class="toggle-container">
+          <input type="checkbox" class="toggle" id="ac-toggle">
+        </div>
+        <div class="switch-status" id="ac-status">Connecting...</div>
+      </div>
+      
+      <div class="switch-card" id="washing-card">
+        <div class="switch-icon">🧺</div>
+        <div class="switch-name">Washing Machine</div>
+        <div class="toggle-container">
+          <input type="checkbox" class="toggle" id="washing-toggle">
+        </div>
+        <div class="switch-status" id="washing-status">Connecting...</div>
+      </div>
+      
+      <div class="switch-card" id="dishwasher-card">
+        <div class="switch-icon">🍽️</div>
+        <div class="switch-name">Dishwasher</div>
+        <div class="toggle-container">
+          <input type="checkbox" class="toggle" id="dishwasher-toggle">
+        </div>
+        <div class="switch-status" id="dishwasher-status">Connecting...</div>
+      </div>
+    </div>
+    
+    <footer>
+      <p>SwitchPilot - Control Your Home From Anywhere</p>
+    </footer>
+  </div>
+  
+  <div class="notification" id="notification">Switch status updated</div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  
+  <script>
+    // 🔑 Using your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCSHQEr6gPdQINIDGxp1FK225ID4DJSjvw",
+      authDomain: "rahul-ea39c.firebaseapp.com",
+      projectId: "rahul-ea39c",
+      storageBucket: "rahul-ea39c.firebasestorage.app",
+      messagingSenderId: "55514820586",
+      appId: "1:55514820586:web:4d87f3a0d1108eba264c93",
+      measurementId: "G-BESW1Y04PF"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    
+    // Define all appliances
+    const appliances = [
+      {id: 'fan', name: 'Fan', icon: '🌀'},
+      {id: 'light', name: 'Light', icon: '💡'},
+      {id: 'geyser', name: 'Geyser', icon: '🚿'},
+      {id: 'ac', name: 'AC', icon: '❄️'},
+      {id: 'washing', name: 'Washing Machine', icon: '🧺'},
+      {id: 'dishwasher', name: 'Dishwasher', icon: '🍽️'}
+    ];
+    
+    // Setup each appliance
+    appliances.forEach(appliance => {
+      const toggleEl = document.getElementById(`${appliance.id}-toggle`);
+      const statusEl = document.getElementById(`${appliance.id}-status`);
+      const ref = db.ref(`remoteSwitch/${appliance.id}`);
+      
+      // Initialize with default state if not exists
+      ref.once('value', snapshot => {
+        if (!snapshot.exists()) {
+          ref.set(false);
+        }
+      });
+      
+      // Listen for state changes from Firebase
+      ref.on('value', snapshot => {
+        const isOn = snapshot.val();
+        updateUI(appliance.id, isOn);
+      });
+      
+      // Toggle switch state on input change
+      toggleEl.addEventListener('change', () => {
+        const newState = toggleEl.checked;
+        ref.set(newState);
+        showNotification(`${appliance.name} turned ${newState ? 'ON' : 'OFF'}`);
+      });
+    });
+    
+    // Update UI based on state
+    function updateUI(applianceId, isOn) {
+      const toggleEl = document.getElementById(`${applianceId}-toggle`);
+      const statusEl = document.getElementById(`${applianceId}-status`);
+      
+      toggleEl.checked = isOn;
+      
+      if (isOn) {
+        statusEl.textContent = 'ON';
+        statusEl.className = 'switch-status status-on';
+      } else {
+        statusEl.textContent = 'OFF';
+        statusEl.className = 'switch-status status-off';
+      }
+    }
+    
+    // Show notification
+    function showNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
